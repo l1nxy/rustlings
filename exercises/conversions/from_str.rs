@@ -23,6 +23,27 @@ struct Person {
 impl FromStr for Person {
     type Err = String;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        if s.len() == 0 {
+            Err("string is empty!".to_string())
+        } else {
+            let x: Vec<_> = s.split(',').collect();
+            if let [name, age] = *x.as_slice() {
+                if name.len() == 0 {
+                    Err("name is empty!".to_string())
+                } else {
+                    if let a = age.parse::<usize>().unwrap() {
+                        Ok(Person {
+                            name: name.to_string(),
+                            age: a,
+                        })
+                    }else{
+                        Err(String::from("Err age!"))
+                    }
+                }
+            } else {
+                Err("vec err!".to_string())
+            }
+        }
     }
 }
 
@@ -82,5 +103,4 @@ mod tests {
     fn missing_name_and_invalid_age() {
         ",one".parse::<Person>().unwrap();
     }
-
 }

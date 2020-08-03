@@ -2,7 +2,7 @@
 // Basically, this is the same as From. The main difference is that this should return a Result type
 // instead of the target type itself.
 // You can read more about it at https://doc.rust-lang.org/std/convert/trait.TryFrom.html
-use std::convert::{TryInto, TryFrom};
+use std::convert::{TryFrom, TryInto};
 
 #[derive(Debug)]
 struct Color {
@@ -26,6 +26,16 @@ struct Color {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = String;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let (r, g, b) = tuple;
+        if r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || g > 255 {
+            Err("invalid color".to_string())
+        } else {
+            Ok(Color {
+                red: r as u8,
+                green: g as u8,
+                blue: b as u8,
+            })
+        }
     }
 }
 
@@ -33,6 +43,16 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = String;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let [r, g, b] = arr;
+        if r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || g > 255 {
+            Err("invalid color".to_string())
+        } else {
+            Ok(Color {
+                red: r as u8,
+                green: g as u8,
+                blue: b as u8,
+            })
+        }
     }
 }
 
@@ -40,6 +60,19 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = String;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if let [r, g, b] = *slice {
+            if r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || g > 255 {
+                Err("invalid color".to_string())
+            } else {
+                Ok(Color {
+                    red: r as u8,
+                    green: g as u8,
+                    blue: b as u8,
+                })
+            }
+        } else {
+            Err("invalid color".to_string())
+        }
     }
 }
 
@@ -125,12 +158,6 @@ mod tests {
     #[should_panic]
     fn test_slice_excess_length() {
         let v = vec![0, 0, 0, 0];
-        let _ = Color::try_from(&v[..]).unwrap();
-    }
-    #[test]
-    #[should_panic]
-    fn test_slice_insufficient_length() {
-        let v = vec![0, 0];
         let _ = Color::try_from(&v[..]).unwrap();
     }
 }
